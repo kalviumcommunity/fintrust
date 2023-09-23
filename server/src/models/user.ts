@@ -13,7 +13,6 @@ class User extends Model {
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
-  private passwordHash!: string;
 
   public async setPassword(password: string): Promise<void> {
     const saltRounds = 10;
@@ -21,10 +20,11 @@ class User extends Model {
   }
 
   public async checkPassword(password: string): Promise<boolean> {
-    if (!this.passwordHash) {
+    if (!this.password) {
+      console.log(password)
       return false;
     }
-    return bcrypt.compare(password, this.passwordHash);
+    return bcrypt.compare(password, this.password);
   }
 }
 
