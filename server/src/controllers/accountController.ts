@@ -1,55 +1,51 @@
-
 import { Request, Response } from "express";
-import Account from "../models/account"; 
-
+// @ts-ignore
+import { CurrentAccount, SavingAccount } from "../services/account";
 
 async function generateAccountNumber(): Promise<number> {
-  const randomNumber = Math.floor(Math.random() * 1000000000000)
+  const randomNumber = Math.floor(Math.random() * 1000000000000);
   return randomNumber;
 }
 async function createAccount(req: Request, res: Response) {
   const { accountType, balance, interestRate, overdraftLimit } = req.body;
 
+  const userId = req.user.id;
 
-  const userId = req.user.id
- 
   try {
-
-const existingAccount:any = await Account.findAll({
-      where: {
-        userId,
-            type: accountType,
-      },
-    });
-
-    if (existingAccount.length>2) {
-    
-      return res.status(400).json({ error: "Customer already has an account of the same type" });
-    }
+    let newAccount: any;
 
     const accountNumber = await generateAccountNumber();
 
-    const account = await Account.create({
-      accountNumber,
-      balance,
-      userId,
-      type: accountType
-    });
-
-   
+    console.log(accountNumber);
     if (accountType === "savings") {
-      await account.setInterestRate(23);
+      const saving = new SavingAccount({
+        accountType,
+        accountNumber,
+        balance,
+        interestRate,
+        userId,
+      });
+      newAccount = await saving.createAccount({ accountNumber });
     } else if (accountType === "current") {
-      await account.setOverDraftLimit(4455);
+      const current = new CurrentAccount({
+        accountType,
+        accountNumber,
+        balance,
+        overdraftLimit,
+        userId,
+      });
+      newAccount = await current.createAccount({ accountNumber });
     } else {
-      return res.status(400).json({ error: "Invalid account type" });
+      return res.status(400).json({ message: "Invalid account type" });
     }
 
-    await account.save(); 
-
-    return res.status(201).json({ message: "Account created successfully", account });
-  } catch (error:any) {
-    return res.status(500).json({ error: "Error creating account", details: error.message });
+    return res
+      .status(201)
+      .json({ message: "Account created successfully", newAccount });
+  } catch (error: any) {
+    return res
+      .status(500)
+      .json({ message: "Error creating account", details: error.message });
   }
 }
 

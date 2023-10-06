@@ -1,29 +1,27 @@
-import express, { Express, Request, Response,NextFunction } from "express";
-import sequelize from "../sequelize-config";
+import express, { Express } from "express";
 require("dotenv").config();
 const app: Express = express();
 const port = process.env.PORT || 3000;
-import userRoutes from './routes/userRoutes';
-import accountRoutes from './routes/accountRoutes'
-import Account from "./models/account";
-import User from "./models/user";
-app.use(express.json());
-Account.associate({ User });
-app.get("/api/sample", (req: Request, res: Response, next:NextFunction) => {
-  res.json({ message: "This is a sample API endpoint." });
-});
-app.use('/api', userRoutes);
-app.use('/api', accountRoutes);
+import userRoutes from "./routes/userRoutes";
+import accountRoutes from "./routes/accountRoutes";
 
-sequelize
-  .sync()
-  .then(() => {
-    console.log('Database connected.');
+import { connection } from "../config/config";
+app.use(express.json());
+
+app.use("/api", userRoutes);
+app.use("/api", accountRoutes);
+
+connection.connect(async (err: any) => {
+  if (err) {
+    console.error(
+      `Error connecting to the database: ${process.env.DB_NAME}`,
+      err
+    );
+  } else {
     app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
+      console.log(`Server is running on port: ${port}`);
     });
-    
-  })
-  .catch((error) => {
-    console.error('Database connection error:', error);
-  });
+
+    console.log(`Connected to the database: : ${process.env.DB_NAME}`);
+  }
+});
