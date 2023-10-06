@@ -1,4 +1,4 @@
-import { User } from "./models/user"; 
+import { User } from "./services/user"; 
 
 declare global {
   namespace Express {
@@ -6,4 +6,8 @@ declare global {
       user?: User; 
     }
   }
+}
+
+export function Router() {
+  throw new Error('Function not implemented.');
 }

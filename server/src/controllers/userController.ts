@@ -1,62 +1,89 @@
-// src/controllers/userController.ts
-import { Request, Response } from "express";
-import User from "../models/user";
-import { Op } from "sequelize";
 import { generateToken } from "../helpers/jwt";
+import User from "../services/user";
+import { Request, Response } from "express";
 
+// Controller function to register a new user
+export const registerUser = async (req: Request, res: Response) => {
+  const { username, email, address, phoneNumber, password, role } = req.body;
 
-export const createUser = async (req: Request, res: Response) => {
+  // Create an instance of the User class
+  const user = new User({
+    username,
+    email,
+    address,
+    phoneNumber,
+    role,
+    password,
+  });
   try {
-    const { username, email, password, address, phonenumber } = req.body;
-
-    if (!username || !email || !password || !address) {
-      return res.status(201).json({ message: "404444" });
-    }
-    console.log(username, email, password);
-    const existingUser = await User.findOne({
-      where: {
-        [Op.or]: [{ username }, { email }],
-      },
-    });
-
-    if (existingUser) {
+    // Check if any required field is missing
+    if (!email || !username || !address || !phoneNumber || !password) {
       return res
-        .status(400)
-        .json({ error: "Username or email already in use." });
+        .status(422)
+        .json({ message: "Please fill all the credentials" });
     }
-    const user = new User({
-      username,
-      email,
-      address,
-    });
 
-    await user.setPassword(password);
-    await user.save();
-
-
-    return res.status(201).json({ message: "User created successfully." });
+    // Check if an account with the same email, username, or phoneNumber already exists
+    const userExists = await user.checkDuplicate();
+    if (userExists) {
+      return res.status(422).json({
+        message: "Account already exists with these credentials",
+      });
+    }
+    // Create a new user with the provided data
+    const createdUser = await user.createUser(password);
+    res.status(201).json({ message: "User created successfully", createdUser });
   } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ error: "Could not create user." });
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
+// Controller function to handle user login
 export const loginUser = async (req: Request, res: Response) => {
+  // Destructure the request body to get username and password
+  const { username, password } = req.body;
+
+  // Create an instance of the User class
+  const user = new User({ username, password });
   try {
-    const { username, password } = req.body;
+    // Retrieve user data by username
+    const userData = await user.getUserByUsername();
 
-    const user = await User.findOne({ where: { username } });
-
-    if (!user || !(await user.checkPassword(password))) {
-      return res.status(401).json({ error: "Invalid credentials" });
+    if (!userData) {
+      return res.status(401).json({ message: "Invalid username or password" });
     }
 
-    const token = generateToken(user.id);
-    return res.status(200).json({ message: "Login successful", token });
+    // Compare the provided password with the stored password hash
+
+    const passwordsMatch = await user.comparePasswords(
+      password,
+      userData.password
+    );
+
+    // If passwords do not match, send an authentication error
+    if (!passwordsMatch) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+
+    // Remove sensitive information from the user data
+    const resUserData = { ...userData };
+    delete resUserData.password;
+    delete resUserData.role_id;
+    delete resUserData.created_at;
+    delete resUserData.updated_at;
+
+    // Generate an access token for the user
+    const accessToken = await generateToken(userData.id);
+
+    res
+      .status(200)
+      .json({ message: "Login successful", user: resUserData, accessToken });
   } catch (error) {
-    console.error("Error logging in user:", error);
-    res.status(500).json({ error: "Could not log in user." });
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
-
+// Export the controller functions
+module.exports = { registerUser, loginUser };
