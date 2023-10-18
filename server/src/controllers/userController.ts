@@ -4,20 +4,19 @@ import { Request, Response } from "express";
 
 // Controller function to register a new user
 export const registerUser = async (req: Request, res: Response) => {
-  const { username, email, address, phoneNumber, password, role } = req.body;
+  const { username, email, phoneNumber, password, role } = req.body;
 
   // Create an instance of the User class
   const user = new User({
     username,
     email,
-    address,
     phoneNumber,
     role,
     password,
   });
   try {
     // Check if any required field is missing
-    if (!email || !username || !address || !phoneNumber || !password) {
+    if (!email || !username || !phoneNumber || !password) {
       return res
         .status(422)
         .json({ message: "Please fill all the credentials" });
