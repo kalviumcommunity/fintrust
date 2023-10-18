@@ -14,8 +14,8 @@ class User extends UserBase {
 
       this.password = await bcrypt.hash(password, 10);
       const result = await this.db.execute(
-        "INSERT INTO users (username, password, email, phoneNumber, address,role_id) VALUES (?, ?, ?, ?, ?,?)",
-        [this.username, this.password, this.email, this.phoneNumber, this.address, this.role || null]
+        "INSERT INTO users (username, password, email, phoneNumber,role_id) VALUES (?, ?, ?, ?, ?,?)",
+        [this.username, this.password, this.email, this.phoneNumber, this.role || null]
       );
 
       return result;
