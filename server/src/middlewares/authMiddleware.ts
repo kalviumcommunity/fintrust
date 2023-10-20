@@ -9,31 +9,28 @@ export const authMiddleware = async (
 ) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
- 
+
     if (!token) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
     const usertoken = verifyToken(token);
 
-
     const userId = usertoken.userId;
-
 
     if (!userId) {
       return res.status(401).json({ error: "Invalid token" });
     }
 
-    const user = new User({})
+    const user = new User({});
 
-    const userFound = await user.getUserByUserid(userId)
+    const userFound = await user.getUserByUserid(userId);
 
-    console.log(userFound)
     if (!userFound) {
-      return res.status(401).json({ error: 'Authentication required' });
+      return res.status(401).json({ error: "Authentication required" });
     }
 
-    req.user = user;
+    req.user = userFound;
 
     next();
   } catch (error) {

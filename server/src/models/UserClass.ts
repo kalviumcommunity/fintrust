@@ -1,7 +1,6 @@
 const mysql = require("mysql2/promise");
 const bcrypt = require("bcrypt");
 
-
 interface UserInterface {
   db: any;
   username: string;
@@ -13,20 +12,23 @@ interface UserInterface {
   id?: number;
   createUser(user: any): Promise<any>;
   getUserByUsername(username: any): Promise<any>;
-  comparePasswords(candidatePassword: any, hashedPassword: any): Promise<boolean>;
+  comparePasswords(
+    candidatePassword: any,
+    hashedPassword: any
+  ): Promise<boolean>;
   checkDuplicate(email: any, username: any, phoneNumber: any): Promise<any>;
 }
 
 // Define an abstract class UserBase that implements IUser
 abstract class UserBase implements UserInterface {
-  db:any
+  db: any;
   username: string;
   email: string;
   address: string;
   phoneNumber: number;
   role: number;
 
-  constructor(user:any) {
+  constructor(user: any) {
     const { username, password, email, phoneNumber, address, role } = user;
     this.db = mysql.createPool({
       host: process.env.DB_HOST,
@@ -43,9 +45,16 @@ abstract class UserBase implements UserInterface {
 
   // Define abstract methods that subclasses must implement
   abstract createUser(user: Partial<UserInterface>): Promise<string>;
-  abstract checkDuplicate(email: string, username: string, phoneNumber: string): Promise<boolean>;
+  abstract checkDuplicate(
+    email: string,
+    username: string,
+    phoneNumber: string
+  ): Promise<boolean>;
   abstract getUserByUsername(username: string): Promise<UserInterface | null>;
-  abstract comparePasswords(password: string, hashedPassword: string): Promise<boolean>;
+  abstract comparePasswords(
+    password: string,
+    hashedPassword: string
+  ): Promise<boolean>;
 }
 
 export default UserBase;
