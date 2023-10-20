@@ -8,8 +8,8 @@ import accountRoutes from "./routes/accountRoutes";
 import { connection } from "../config/config";
 app.use(express.json());
 
-app.use("/api", userRoutes);
-app.use("/api", accountRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/account", accountRoutes);
 
 connection.connect(async (err: any) => {
   if (err) {

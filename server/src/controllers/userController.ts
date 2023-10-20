@@ -47,6 +47,9 @@ export const loginUser = async (req: Request, res: Response) => {
   const user = new User({ username, password });
   try {
     // Retrieve user data by username
+    if(!username || !password){
+      return res.status(401).json({ message: "Please fill all the credentials" });
+    }
     const userData = await user.getUserByUsername();
 
     if (!userData) {
