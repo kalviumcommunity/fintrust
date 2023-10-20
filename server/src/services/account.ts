@@ -51,12 +51,10 @@ export class SavingAccount extends AccountBase {
 
 export class CurrentAccount extends AccountBase {
   public overdraftLimit!: number;
-
   constructor(data: any) {
     super(data);
     this.overdraftLimit = data.overdraftLimit || 0;
   }
-
   public async createAccount(): Promise<any> {
     const result = await this.db.execute(
       "INSERT INTO accounts ( account_type, account_number, balance, overdraft_limit, user_id, branch) VALUES (?,?, ?, ?, ?, ?)",
