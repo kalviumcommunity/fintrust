@@ -1,5 +1,5 @@
 import { generateToken } from "../helpers/jwt";
-import User from "../services/user";
+import User from "../services/user.service";
 import { Request, Response } from "express";
 
 // Controller function to register a new user

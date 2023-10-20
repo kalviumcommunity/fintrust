@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../helpers/jwt"; // Import the function to verify JWT tokens
-import User from "../services/user";
+import User from "../services/user.service";
 
 export const authMiddleware = async (
   req: Request,
