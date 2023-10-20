@@ -3,18 +3,17 @@ import TransactionBase from "../models/TransactionClass";
 
 class Transaction extends TransactionBase {
 
-  private password!:any;
   constructor(transactionDetails: any) {
     super(transactionDetails)
   }
 
   public async addEntry() {
     try {
-      const [rows, fields] = await this.db.execute(
-        "SELECT * FROM users WHERE id = ?",
-        []
+      const result = await this.db.execute(
+        "INSERT INTO transactions (account_id, type, user_id, amount, branch_id) VALUES (?, ?, ?, ?, ?)",
+        [this.account_id, this.type, this.user_id, this.amount, this.branch_id]
       );
-      return rows[0];
+      return result;
     } catch (error) {
       throw error;
     }

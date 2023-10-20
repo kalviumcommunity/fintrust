@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 // @ts-ignore
-import { CurrentAccount, SavingAccount } from "../services/account";
+import { CurrentAccount, SavingAccount } from "../services/account.service";
 import AccountBase from "../models/AccountClass";
 
 async function generateAccountNumber(): Promise<String> {
