@@ -1,19 +1,19 @@
 const mysql = require("mysql2/promise");
 
 interface AccountInterface {
-  accountId:number
+  accountId: number;
   accountNumber: string;
   balance: number;
   userId: number;
   type: string;
   branch_id: number;
   db: any;
-  deleteAccount(user: any): Promise<any>;
+  getAccountDetails(user: any): Promise<any>;
 }
 
 // Define an abstract class UserBase that implements IUser
- class AccountBase implements AccountInterface {
-  accountId!:number
+class AccountBase implements AccountInterface {
+  accountId!: number;
   accountNumber!: string;
   balance!: number;
   userId!: number;
@@ -22,15 +22,21 @@ interface AccountInterface {
   db: any;
 
   constructor(accountData: any) {
-    const { accountId,accountType, accountNumber, balance, userId, branch_id } =
-      accountData;
+    const {
+      accountId,
+      accountType,
+      accountNumber,
+      balance,
+      userId,
+      branch_id,
+    } = accountData;
     this.db = mysql.createPool({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
     });
-    this.accountId = accountId
+    this.accountId = accountId;
     this.type = accountType;
     this.accountNumber = accountNumber;
     this.balance = balance;
@@ -40,10 +46,30 @@ interface AccountInterface {
 
   public async deleteAccount(): Promise<string> {
     // implementation goes here
-    const result = await this.db.execute(`DELETE FROM accounts WHERE account_id = ${this.accountId}`);
-    return result
+    const result = await this.db.execute(
+      `DELETE FROM accounts WHERE account_id = ${this.accountId}`
+    );
+    return result;
   }
- 
+
+  public async getAccountDetails(): Promise<string> {
+
+    const [rows, fields] = await this.db
+      .execute(`
+      SELECT *
+      FROM 
+         accounts a
+      INNER JOIN users u ON a.user_id = u.id
+      INNER JOIN branch b ON a.branch = b.branch_id
+      WHERE 
+         u.id = ${this.userId}`);
+    return rows;
+  }
+
+
+  destroy() {
+    this.db.end();
+  }
 }
 
 export default AccountBase;

@@ -55,6 +55,11 @@ abstract class UserBase implements UserInterface {
     password: string,
     hashedPassword: string
   ): Promise<boolean>;
+
+
+  destroy() {
+    this.db.end();
+  }
 }
 
 export default UserBase;
