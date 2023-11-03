@@ -76,7 +76,7 @@ async function getDetails(req: Request, res: Response) {
   try {
     const account = new AccountBase({ userId });
     const accountDetails: any = await account.getAccountDetails();
-
+    const test = await account.getAccountDetailsWithBalanceSum()
     accountDetails.forEach((account: any) => {
       delete account.password;
       delete account.created_at;
@@ -87,7 +87,7 @@ async function getDetails(req: Request, res: Response) {
     });
     
     account.destroy()
-    return res.status(200).json({ accountDetails, message: "" });
+    return res.status(200).json({ accountDetails,test, message: "" });
   } catch (error: any) {
     return res
       .status(500)
