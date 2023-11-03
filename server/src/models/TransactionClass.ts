@@ -35,6 +35,9 @@ interface TransactionInterface {
 
   abstract addEntry(username: string): Promise<TransactionInterface | null>;
  
+  destroy() {
+    this.db.end();
+  }
 }
 
 export default TransactionBase;

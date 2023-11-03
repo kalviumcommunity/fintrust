@@ -30,6 +30,7 @@ export const registerUser = async (req: Request, res: Response) => {
       });
     }
     // Create a new user with the provided data
+    user.destroy();
     const createdUser = await user.createUser(password);
     res.status(201).json({ message: "User created successfully", createdUser });
   } catch (error) {
@@ -77,7 +78,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     // Generate an access token for the user
     const accessToken = await generateToken(userData.id);
-
+    user.destroy();
     res
       .status(200)
       .json({ message: "Login successful", user: resUserData, accessToken });

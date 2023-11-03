@@ -62,6 +62,7 @@ async function deleteAccount(req: Request, res: Response) {
     const account = new AccountBase({ accountId });
     await account.deleteAccount();
 
+    account.destroy()
     return res.status(200).json({ message: "Account Deleted successfully" });
   } catch (error: any) {
     return res
@@ -70,4 +71,28 @@ async function deleteAccount(req: Request, res: Response) {
   }
 }
 
-export { createAccount, deleteAccount };
+async function getDetails(req: Request, res: Response) {
+  const userId = req.user.id;
+  try {
+    const account = new AccountBase({ userId });
+    const accountDetails: any = await account.getAccountDetails();
+
+    accountDetails.forEach((account: any) => {
+      delete account.password;
+      delete account.created_at;
+      delete account.updated_at;
+      delete account.user_id;
+      delete account.id;
+      delete account.branch_id;
+    });
+    
+    account.destroy()
+    return res.status(200).json({ accountDetails, message: "" });
+  } catch (error: any) {
+    return res
+      .status(500)
+      .json({ message: "Error creating account", details: error.message });
+  }
+}
+
+export { createAccount, deleteAccount, getDetails };
