@@ -52,20 +52,23 @@ class AccountBase implements AccountInterface {
     return result;
   }
 
-  public async getAccountDetails(): Promise<string> {
-
-    const [rows, fields] = await this.db
-      .execute(`
-      SELECT *
-      FROM 
-         accounts a
-      INNER JOIN users u ON a.user_id = u.id
-      INNER JOIN branch b ON a.branch = b.branch_id
-      WHERE 
-         u.id = ${this.userId}`);
-    return rows;
+  public async getAccountDetails(): Promise<any[]> {
+    try {
+      const [rows, fields] = await this.db.execute(
+        `
+        SELECT *
+        FROM accounts a
+        INNER JOIN users u ON a.user_id = u.id
+        INNER JOIN branch b ON a.branch = b.branch_id
+        WHERE u.id = ?`,
+        [this.userId]
+      );
+  
+      return rows; 
+    } catch (error) {
+      throw error; // Handle errors appropriately
+    }
   }
-
 
   destroy() {
     this.db.end();
