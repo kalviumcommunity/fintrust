@@ -22,6 +22,7 @@ class AccountBase implements AccountInterface {
   db: any;
 
   constructor(accountData: any) {
+    console.log("base class constructor  called")
     const {
       accountId,
       accountType,
@@ -89,8 +90,29 @@ class AccountBase implements AccountInterface {
     }
   }
 
+  public async getAccountDetailsWithBalanceSumUsingUnion(): Promise<any[]> {
+    try {
+      const [rows, fields] = await this.db.execute(
+        `
+        SELECT a.*, b.*, u.*,
+          (SELECT SUM(balance) FROM accounts subaccount WHERE subaccount.user_id = a.user_id) as totalBalance
+        FROM accounts a
+        INNER JOIN users u ON a.user_id = u.id
+        INNER JOIN branch b ON a.branch_id = b.branch_id
+        WHERE u.id = ?`,
+        [this.userId]
+      );
+  
+      return rows; // Return the rows as an array of objects with an additional 'totalBalance' field
+    } catch (error) {
+      throw error; // Handle errors appropriately
+    }
+  }
+  
+
   destroy() {
     this.db.end();
+    console.log("descturcotr called")
   }
 }
 

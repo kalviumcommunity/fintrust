@@ -6,6 +6,7 @@ class User extends UserBase {
 
   private password!:any;
   constructor(user: any) {
+    console.log("sub class constructor  called")
     super(user)
   }
 
