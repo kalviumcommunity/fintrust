@@ -90,17 +90,27 @@ class AccountBase implements AccountInterface {
     }
   }
 
-  public async getAccountDetailsWithBalanceSumUsingUnion(): Promise<any[]> {
+  public async getAccountDetailsWithBalanceSumUnion(): Promise<any[]> {
     try {
       const [rows, fields] = await this.db.execute(
         `
-        SELECT a.*, b.*, u.*,
-          (SELECT SUM(balance) FROM accounts subaccount WHERE subaccount.user_id = a.user_id) as totalBalance
+        SELECT a.*, u.*, b.*, NULL as totalBalance
         FROM accounts a
         INNER JOIN users u ON a.user_id = u.id
         INNER JOIN branch b ON a.branch_id = b.branch_id
-        WHERE u.id = ?`,
-        [this.userId]
+        WHERE u.id = ?
+        
+        UNION
+  
+        SELECT a.*, u.*, b.*, SUM(subaccount.balance) as totalBalance
+        FROM accounts a
+        INNER JOIN users u ON a.user_id = u.id
+        INNER JOIN branch b ON a.branch_id = b.branch_id
+        INNER JOIN accounts subaccount ON a.user_id = subaccount.user_id
+        WHERE u.id = ?
+        GROUP BY a.account_id
+        `,
+        [this.userId, this.userId]
       );
   
       return rows; // Return the rows as an array of objects with an additional 'totalBalance' field
@@ -108,6 +118,7 @@ class AccountBase implements AccountInterface {
       throw error; // Handle errors appropriately
     }
   }
+  
   
 
   destroy() {
