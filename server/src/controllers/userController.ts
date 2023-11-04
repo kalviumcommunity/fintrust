@@ -30,8 +30,9 @@ export const registerUser = async (req: Request, res: Response) => {
       });
     }
     // Create a new user with the provided data
-    user.destroy();
     const createdUser = await user.createUser(password);
+
+    user.destroy();
     res.status(201).json({ message: "User created successfully", createdUser });
   } catch (error) {
     console.error(error);

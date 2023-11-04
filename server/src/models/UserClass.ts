@@ -29,6 +29,7 @@ abstract class UserBase implements UserInterface {
   role: number;
 
   constructor(user: any) {
+    console.log("base class constructor  called")
     const { username, password, email, phoneNumber, address, role } = user;
     this.db = mysql.createPool({
       host: process.env.DB_HOST,
@@ -58,6 +59,7 @@ abstract class UserBase implements UserInterface {
 
 
   destroy() {
+    console.log("base class desctructor  called")
     this.db.end();
   }
 }
