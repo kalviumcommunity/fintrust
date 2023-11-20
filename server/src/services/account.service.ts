@@ -29,7 +29,7 @@ export class CurrentAccount extends AccountBase {
   public overdraftLimit!: number;
   constructor(data: any) {
     super(data);
-    this.overdraftLimit = data.overdraftLimit || 0;
+    this.overdraftLimit = data.overdraftLimit || 5;
   }
   public async createAccount(): Promise<any> {
     const result = await this.db.execute(

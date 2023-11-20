@@ -29,8 +29,16 @@ abstract class UserBase implements UserInterface {
   role: number;
 
   constructor(user: any) {
+<<<<<<< Updated upstream
     console.log("base class constructor  called")
+=======
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
     const { username, password, email, phoneNumber, address, role } = user;
+=======
+    console.log("base class constructor  called")
+    const { username, email, phoneNumber, address, role } = user;
+>>>>>>> Stashed changes
     this.db = mysql.createPool({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,

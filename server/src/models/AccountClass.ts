@@ -47,6 +47,13 @@ class AccountBase implements AccountInterface {
 
   public async deleteAccount(): Promise<string> {
     // implementation goes here
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+    const result = await this.db.execute(`DELETE FROM accounts WHERE account_id = ${this.accountId}`);
+    return result
+=======
+>>>>>>> Stashed changes
     const result = await this.db.execute(
       `DELETE FROM accounts WHERE account_id = ${this.accountId}`
     );
@@ -90,6 +97,41 @@ class AccountBase implements AccountInterface {
     }
   }
 
+<<<<<<< Updated upstream
+=======
+  public async getBalance(): Promise<number> {
+    // implementation goes here
+    const result = await this.db.execute(
+      `SELECT balance FROM accounts WHERE account_id = ${this.accountId}`
+    );
+  
+    const balance = parseFloat(result[0][0].balance);
+    return balance;
+  }
+  
+
+  public async updateBalance(newBalance: number): Promise<void> {
+    try {
+      // Use a SQL UPDATE query to update the balance in the database
+      const result = await this.db.execute(
+        'UPDATE accounts SET balance = ? WHERE account_id = ?',
+        [newBalance, this.accountId]
+      );
+
+      if (result[0].affectedRows === 1) {
+        // The update was successful
+        this.balance = newBalance; 
+        return result
+      } else {
+        throw new Error('Failed to update balance');
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+ 
+
+>>>>>>> Stashed changes
   public async getAccountDetailsWithBalanceSumUnion(): Promise<any[]> {
     try {
       const [rows, fields] = await this.db.execute(
@@ -124,6 +166,10 @@ class AccountBase implements AccountInterface {
   destroy() {
     this.db.end();
     console.log("descturcotr called")
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
   }
 }
 
